@@ -1,0 +1,65 @@
+﻿### TEST 1 - Upgrade a ejecutiva (Gold + retraso 90). Esperado: upgradedToBusiness = true
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test1","age":50,"membershipStatus":"Gold","luggageWeight":15,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV001","delayMinutes":90,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false},{"number":"14C","emergencyExit":false,"occupied":false}]}
+
+### TEST 2 - Check-in prioritario (edad 70). Esperado: priorityCheckIn = true
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test2","age":70,"membershipStatus":"Basic","luggageWeight":15,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV002","delayMinutes":0,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 3 - Descuento por equipaje liviano (8 kg). Esperado: discountPercent = 10.0
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test3","age":50,"membershipStatus":"Basic","luggageWeight":8,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV003","delayMinutes":0,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 4 - Sin ascenso por equipaje pesado (25 kg). Esperado: eligibleForUpgrade = false, upgradedToBusiness = false
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test4","age":50,"membershipStatus":"Platinum","luggageWeight":25,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV004","delayMinutes":90,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 5 - Salida de emergencia (25 anos, Any). Esperado: assignedSeat = 12A y asiento occupied = true
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test5","age":25,"membershipStatus":"Basic","luggageWeight":15,"seatPreference":"Any","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV005","delayMinutes":0,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false},{"number":"14C","emergencyExit":false,"occupied":false}]}
+
+### TEST 6 - Compensacion por retraso extremo (200 min). Esperado: compensation = 200.0
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test6","age":50,"membershipStatus":"Basic","luggageWeight":15,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV006","delayMinutes":200,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 7 - Puntos extra en vuelo largo (Silver, 6 h). Esperado: loyaltyPoints = 1500
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test7","age":50,"membershipStatus":"Silver","luggageWeight":15,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":1000},"flight":{"flightNumber":"AV007","delayMinutes":0,"durationHours":6},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 8 - Equipaje no permitido (18 kg en vuelo de 1.5 h). Esperado: luggageAllowed = false
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test8","age":50,"membershipStatus":"Basic","luggageWeight":18,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV008","delayMinutes":0,"durationHours":1.5},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 9 - Salon VIP (Platinum). Esperado: vipLoungeAccess = true
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test9","age":50,"membershipStatus":"Platinum","luggageWeight":15,"seatPreference":"Window","travelingWithChildren":false,"loyaltyPoints":0},"flight":{"flightNumber":"AV009","delayMinutes":0,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 10 - Asiento familiar. Esperado: preferentialSeat = true y assignedSeat = null
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Test10","age":35,"membershipStatus":"Basic","luggageWeight":15,"seatPreference":"Any","travelingWithChildren":true,"loyaltyPoints":0},"flight":{"flightNumber":"AV010","delayMinutes":0,"durationHours":3},"seats":[{"number":"12A","emergencyExit":true,"occupied":false}]}
+
+### TEST 11 - Caso combinado (varias reglas a la vez)
+POST http://localhost:8080/airline/evaluate
+Content-Type: application/json
+
+{"passenger":{"name":"Ana Gomez","age":30,"membershipStatus":"Gold","luggageWeight":8,"seatPreference":"Any","travelingWithChildren":false,"loyaltyPoints":1000},"flight":{"flightNumber":"AV123","delayMinutes":200,"durationHours":6},"seats":[{"number":"12A","emergencyExit":true,"occupied":false},{"number":"14C","emergencyExit":false,"occupied":false}]}
