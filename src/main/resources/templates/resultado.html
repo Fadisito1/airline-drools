@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resultado de la evaluaci&oacute;n</title>
+    <style>
+        :root { --azul: #0b3d91; --azul2: #1d6fd6; --bg: #eef3fb; --txt: #1f2a44; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--txt); }
+        .hero { background: linear-gradient(135deg, var(--azul), var(--azul2)); color: #fff; padding: 34px 20px 76px; text-align: center; }
+        .hero h1 { margin: 0 0 8px; font-size: 1.7em; }
+        .chips { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .chip { background: rgba(255, 255, 255, 0.18); padding: 6px 14px; border-radius: 20px; font-size: 0.92em; }
+        .wrap { max-width: 760px; margin: -48px auto 40px; padding: 0 16px; }
+        .card { background: #fff; border-radius: 14px; padding: 22px 24px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(11, 61, 145, 0.10); }
+        .card h2 { margin: 0 0 16px; font-size: 1.1em; color: var(--azul); }
+        .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .tile { border-radius: 10px; padding: 12px 14px; border: 1px solid #e1e8f5; background: #f7f9fd; display: flex; flex-direction: column; gap: 4px; }
+        .tile .lab { font-size: 0.82em; color: #5b6784; }
+        .tile .val { font-size: 1.25em; font-weight: 700; }
+        .tile.on { background: #e8f7ee; border-color: #bfe6cd; }
+        .tile.on .val { color: #1e8449; }
+        .tile.off .val { color: #8a94a8; }
+        .tile.bad { background: #fdecea; border-color: #f5c2bd; }
+        .tile.bad .val { color: #c0392b; }
+        .tile.neu .val { color: var(--azul); }
+        .rules { list-style: none; margin: 0; padding: 0; }
+        .rules li { display: flex; align-items: center; gap: 10px; background: #eaf2ff; border: 1px solid #d3e3fb; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+        .chk { color: #1e8449; font-weight: 700; }
+        .none { color: #7a869f; margin: 0; }
+        .btn { display: block; text-align: center; text-decoration: none; padding: 14px; border-radius: 10px; background: linear-gradient(135deg, var(--azul), var(--azul2)); color: #fff; font-weight: 600; }
+        .btn:hover { filter: brightness(1.08); }
+        @media (max-width: 600px) { .tiles { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <h1>&#9992; Resultado de la evaluaci&oacute;n</h1>
+    <div class="chips">
+        <span class="chip">Pasajero: <b th:text="${resp.passenger.name}"></b></span>
+        <span class="chip">Vuelo: <b th:text="${resp.flight.flightNumber}"></b></span>
+        <span class="chip">Retraso: <b th:text="${resp.flight.delayMinutes} + ' min'"></b></span>
+    </div>
+</header>
+
+<main class="wrap">
+    <section class="card">
+        <h2>Beneficios y restricciones</h2>
+        <div class="tiles">
+            <div class="tile" th:classappend="${resp.passenger.upgradedToBusiness} ? 'on' : 'off'">
+                <span class="lab">Ascenso a clase ejecutiva</span>
+                <span class="val" th:utext="${resp.passenger.upgradedToBusiness} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.eligibleForUpgrade} ? 'on' : 'bad'">
+                <span class="lab">Elegible para ascensos</span>
+                <span class="val" th:utext="${resp.passenger.eligibleForUpgrade} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.priorityCheckIn} ? 'on' : 'off'">
+                <span class="lab">Registro prioritario</span>
+                <span class="val" th:utext="${resp.passenger.priorityCheckIn} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.discountPercent > 0} ? 'on' : 'off'">
+                <span class="lab">Descuento por equipaje</span>
+                <span class="val" th:text="${resp.passenger.discountPercent} + '%'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.assignedSeat != null} ? 'on' : 'off'">
+                <span class="lab">Asiento de salida de emergencia</span>
+                <span class="val" th:text="${resp.passenger.assignedSeat} ?: 'Ninguno'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.compensation > 0} ? 'on' : 'off'">
+                <span class="lab">Compensaci&oacute;n</span>
+                <span class="val" th:text="'$' + ${resp.passenger.compensation}"></span>
+            </div>
+            <div class="tile neu">
+                <span class="lab">Puntos de lealtad</span>
+                <span class="val" th:text="${resp.passenger.loyaltyPoints}"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.luggageAllowed} ? 'on' : 'bad'">
+                <span class="lab">Equipaje permitido</span>
+                <span class="val" th:utext="${resp.passenger.luggageAllowed} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.vipLoungeAccess} ? 'on' : 'off'">
+                <span class="lab">Acceso a la sala VIP</span>
+                <span class="val" th:utext="${resp.passenger.vipLoungeAccess} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+            <div class="tile" th:classappend="${resp.passenger.preferentialSeat} ? 'on' : 'off'">
+                <span class="lab">Asiento preferencial para familias</span>
+                <span class="val" th:utext="${resp.passenger.preferentialSeat} ? 'S&Iacute;' : 'NO'"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Reglas activadas (<span th:text="${#lists.size(resp.firedRules)}"></span>)</h2>
+        <ul class="rules">
+            <li th:each="r : ${resp.firedRules}">
+                <span class="chk">&#10004;</span>
+                <span th:text="${nombresEs.getOrDefault(r, r)}"></span>
+            </li>
+        </ul>
+        <p class="none" th:if="${#lists.isEmpty(resp.firedRules)}">No se activ&oacute; ninguna regla.</p>
+    </section>
+
+    <a class="btn" th:href="@{/}">&larr; Nueva evaluaci&oacute;n</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reglas de Aerol&iacute;nea</title>
+    <style>
+        :root { --azul: #0b3d91; --azul2: #1d6fd6; --bg: #eef3fb; --txt: #1f2a44; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--txt); }
+        .hero { background: linear-gradient(135deg, var(--azul), var(--azul2)); color: #fff; padding: 36px 20px 76px; text-align: center; }
+        .hero .plane { font-size: 2.4em; }
+        .hero h1 { margin: 6px 0 6px; font-size: 1.8em; }
+        .hero p { margin: 0; opacity: 0.85; }
+        .wrap { max-width: 760px; margin: -48px auto 40px; padding: 0 16px; }
+        .card { background: #fff; border-radius: 14px; padding: 22px 24px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(11, 61, 145, 0.10); }
+        .card h2 { margin: 0 0 16px; font-size: 1.1em; color: var(--azul); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+        .full { grid-column: 1 / -1; }
+        label.l { display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 5px; color: #44506b; }
+        input[type=text], input[type=number], select { width: 100%; padding: 10px 12px; border: 1px solid #cfd8e8; border-radius: 8px; font-size: 1em; background: #fbfcff; }
+        input[type=text]:focus, input[type=number]:focus, select:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(29, 111, 214, 0.15); }
+        .opt { display: flex; align-items: center; gap: 10px; background: #f3f7ff; border: 1px solid #dbe5f6; border-radius: 8px; padding: 11px 12px; cursor: pointer; font-size: 0.95em; }
+        .opt input { width: 18px; height: 18px; accent-color: var(--azul2); margin: 0; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--azul), var(--azul2)); color: #fff; font-size: 1.05em; font-weight: 600; cursor: pointer; }
+        button:hover { filter: brightness(1.08); }
+        .foot { text-align: center; color: #7a869f; font-size: 0.8em; margin-top: 14px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <div class="plane">&#9992;</div>
+    <h1>Sistema de reglas de aerol&iacute;nea</h1>
+    <p>Eval&uacute;a beneficios, asientos y compensaciones con el motor de reglas Drools</p>
+</header>
+
+<main class="wrap">
+    <form th:action="@{/evaluar}" th:object="${airlineRequest}" method="post">
+
+        <section class="card">
+            <h2>&#128100; Datos del pasajero</h2>
+            <div class="grid">
+                <div class="full">
+                    <label class="l">Nombre</label>
+                    <input type="text" th:field="*{passenger.name}" placeholder="Ej: Ana G&oacute;mez" required>
+                </div>
+                <div>
+                    <label class="l">Edad</label>
+                    <input type="number" name="passenger.age" min="0" max="120" placeholder="Ej: 30" required>
+                </div>
+                <div>
+                    <label class="l">Membres&iacute;a</label>
+                    <select th:field="*{passenger.membershipStatus}">
+                        <option value="Basic">B&aacute;sica</option>
+                        <option value="Silver">Plata</option>
+                        <option value="Gold">Oro</option>
+                        <option value="Platinum">Platino</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="l">Peso del equipaje (kg)</label>
+                    <input type="number" step="0.1" min="0" name="passenger.luggageWeight" placeholder="Ej: 15" required>
+                </div>
+                <div>
+                    <label class="l">Preferencia de asiento</label>
+                    <select th:field="*{passenger.seatPreference}">
+                        <option value="Any">Cualquiera (sin preferencia)</option>
+                        <option value="Window">Ventana</option>
+                        <option value="Aisle">Pasillo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="l">Puntos de lealtad actuales</label>
+                    <input type="number" min="0" name="passenger.loyaltyPoints" placeholder="Ej: 1000 (opcional)">
+                </div>
+                <div>
+                    <label class="l">&nbsp;</label>
+                    <label class="opt">
+                        <input type="checkbox" th:field="*{passenger.travelingWithChildren}">
+                        Viaja con ni&ntilde;os
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>&#9992; Datos del vuelo</h2>
+            <div class="grid">
+                <div>
+                    <label class="l">N&uacute;mero de vuelo</label>
+                    <input type="text" th:field="*{flight.flightNumber}" placeholder="Ej: AV123" required>
+                </div>
+                <div>
+                    <label class="l">Retraso (minutos)</label>
+                    <input type="number" min="0" name="flight.delayMinutes" placeholder="Ej: 90 (opcional)">
+                </div>
+                <div>
+                    <label class="l">Duraci&oacute;n del vuelo (horas)</label>
+                    <input type="number" step="0.1" min="0" name="flight.durationHours" placeholder="Ej: 3" required>
+                </div>
+                <div>
+                    <label class="l">&nbsp;</label>
+                    <label class="opt">
+                        <input type="checkbox" name="emergencySeatAvailable" value="true" checked>
+                        Hay asiento de salida de emergencia libre
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <button type="submit">Evaluar reglas</button>
+        <div class="foot">Laboratorio 2 &middot; Reglas del negocio con Spring Boot y Drools</div>
+    </form>
+</main>
+</body>
+</html>
